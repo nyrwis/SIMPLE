@@ -21,6 +21,8 @@ def get_environment(env_name):
             from frouge.envs.frouge import FlammeRougeEnv
             return FlammeRougeEnv
         elif env_name in ('blokus'):
+            from blokus.envs.blokus import BlokusEnv
+            return BlokusEnv
         else:
             raise Exception(f'No environment found for {env_name}')
     except SyntaxError as e:
