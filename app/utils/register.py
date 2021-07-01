@@ -51,6 +51,8 @@ def get_network_arch(env_name):
         from models.frouge.models import CustomPolicy
         return CustomPolicy
     elif env_name in ('blokus'):
+        from models.blokus.models import CustomPolicy
+        return CustomPolicy
     else:
         raise Exception(f'No model architectures found for {env_name}')
 
