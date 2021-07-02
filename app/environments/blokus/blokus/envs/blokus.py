@@ -26,7 +26,7 @@ p9 = [9, 4, (6,5), 4, [[2, 3, [(0,1), (0,2), (1,0), (1,1)]], [3, 2, [(0,0), (1,0
 '''
 p1 = [1, 1, [7,7], 1, [[1, 1, [[0,0]]]]]
 p2 = [2, 2, [7,6], 2, [[1, 2, [[0,0], [0,1]]], [2, 1, [[0,0], [1,0]]]]]
-p3 = [3, 3, [6,6], 4, [[2, 2, [[0,0], [0,1], [1,1]]], [2, 2, [[0,1], [1,1], [1,0]]], [2, 2, [[0.0], [1,0], [1,1]]], [2, 2, [[1,0], [0,0], [0,1]]]]]
+p3 = [3, 3, [6,6], 4, [[2, 2, [[0,0], [0,1], [1,1]]], [2, 2, [[0,1], [1,1], [1,0]]], [2, 2, [[0,0], [1,0], [1,1]]], [2, 2, [[1,0], [0,0], [0,1]]]]]
 p4 = [4, 3, [7,5], 2, [[1, 3, [[0,0], [1,0], [2,0]]], [3, 1, [[0,0], [0,1], [0,2]]]]]
 p5 = [5, 4, [6,6], 1, [[2, 2, [[0,0], [0,1], [1,1], [1,0]]]]]
 p6 = [6, 4, [6,5], 4, [[2, 3, [[0,1], [1,0], [1,1], [1,2]]], [3, 2, [[0,0], [1,0], [1,1], [2,0]]], [2, 3, [[0,0], [0,1], [0,2], [1,1]]], [3, 2, [[0,1], [1,0], [1,1], [0,2]]]]]
@@ -80,7 +80,7 @@ class BlokusEnv(gym.Env):
                             r = point[0]+i
                             c = point[1]+j
                             if self.inboard(pos.h, pos.w, r, c) and self.chk_possible(point,r,c,pos) and self.chk_occupied(r,c,pos) and self.chk_adjacent(r,c,pos):
-                                action_num = action_marking[piece.id-1] + (pos.id-1)*piece.dim_size + (r-(pos.h-1))*(self.board_length-(pos.w-1)) + c-(pos.h-1)
+                                action_num = action_marking[piece.id-1] + (pos.id-1)*piece.dim_size + (r-(pos.h-1))*(self.board_length-(pos.w-1)) + c-(pos.h-1) +1
                                 legal_action[action_num] = 1
         return legal_action
 
@@ -94,12 +94,9 @@ class BlokusEnv(gym.Env):
 
 
     def chk_possible(self, possible, r, c, pos):
-        pass
-        '''
         for grid in pos.loc:
-            print(type(grid))
-            print(grid[0], grid[1])
-            print("sdfasdfd")
+            #print(type(grid),len(grid))
+            #print(grid[0], grid[1])
             x,y = grid
             x += r-(pos.h-1)
             y += c-(pos.w-1)
@@ -107,12 +104,10 @@ class BlokusEnv(gym.Env):
             if new_grid==possible:
                     return True
         return False
-        '''
+
 
 
     def chk_occupied(self, r, c, pos):
-        pass
-        '''
         for grid in pos.loc:
             x,y = grid
             x += r-(pos.h-1)
@@ -122,12 +117,10 @@ class BlokusEnv(gym.Env):
                 if new_grid==point:
                     return False
         return True
-        '''
+
 
 
     def chk_adjacent(self, r, c, pos):
-        pass
-        '''
         for grid in pos.loc:
             x = r-(pos.h-1)+grid[0]
             y = c-(pos.w-1)+grid[1]
@@ -136,7 +129,7 @@ class BlokusEnv(gym.Env):
                 if new_grid==point:
                     return False
         return True
-        '''
+
 
 
     @property
@@ -192,7 +185,7 @@ class BlokusEnv(gym.Env):
 
 
     def update_board(self, action):
-        loc_h, loc_w, pos = action[1], action[2], action[3]
+        id, loc_h, loc_w, pos = action[0], action[1], action[2], action[3]
         h, w, loc = pos.h, pos.w, pos.loc
         for grid in loc:
             self.board[grid[0]+loc_h-(h-1)][grid[1]+loc_w-(w-1)] = self.current_player.id
@@ -232,7 +225,8 @@ class BlokusEnv(gym.Env):
         translated_action = []
         id = None
         for id in range(9):
-            if action < action_marking[id]:
+            if action > action_marking[id] and action < action_marking[id+1]:
+                id+=1
                 action = action-action_marking[id-1]
                 translated_action.append(id)
                 break
