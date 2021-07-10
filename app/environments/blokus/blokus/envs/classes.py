@@ -5,7 +5,7 @@ class Piece():
         self.id = info[0]
         self.n = info[1]
         self.dim = info[2]
-        self.dim_size = (8-self.dim[0])*(8-self.dim[1])
+        self.dim_size = self.dim[0]*self.dim[1]
         self.pos = info[3]
         self.pos_list = []
         num=1
@@ -52,22 +52,23 @@ class Player():
 
     def delete_piece(self, action):
         id = action[0]
-        self.pieces[id] = 0
+        self.pieces[id-1] = 0
 
 
     def occupied_update(self, action):
         id, loc_h, loc_w, pos = action[0], action[1], action[2], action[3]
         occupied_update_loc = []
-        i,j = (pos.h-1)+loc_h, (pos.w-1)+loc_w
+        i,j = loc_h-(pos.h-1), loc_w-(pos.w-1)
         for pos in pos.loc:
             grid = list(pos)
+            print(grid[0]+i, grid[1]+j)
             self.occupied[grid[0]+i, grid[1]+j] = 1
 
 
     def corners_update(self, action):
         id, loc_h, loc_w, pos = action[0], action[1], action[2], action[3]
         occupied_update_loc = []
-        i,j = (pos.h-1)+loc_h, (pos.w-1)+loc_w
+        i,j = loc_h-(pos.h-1), loc_w-(pos.w-1)
         dir = [(1,1), (1,-1), (-1,1), (-1,-1)]
         for pos in pos.loc:
             grid = [pos[0]+i, pos[1]+j]
@@ -82,7 +83,7 @@ class Player():
     def adjacents_update(self, action):
         id, loc_h, loc_w, pos = action[0], action[1], action[2], action[3]
         occupied_update_loc = []
-        i,j = (pos.h-1)+loc_h, (pos.w-1)+loc_w
+        i,j = loc_h-(pos.h-1), loc_w-(pos.w-1)
         dir = [(1,0), (0,1), (-1,0), (0,-1)]
         for pos in pos.loc:
             grid = [pos[0]+i, pos[1]+j]

@@ -13,33 +13,22 @@ from .classes import Piece, Player
 
 #information of each piece
 #[id, num of spaces each piece cover, (num of possible grid location in a row, num of possible grid location in a column), possible position, (grid_h, grid_w, grid location)]
-'''
-p1 = [1, 1, (7,7), 1, [[1, 1, [(0,0)]]]]
-p2 = [2, 2, (7,6), 2, [[1, 2, [(0,0), (0,1)]], [2, 1, [(0,0), (1,0)]]]]
-p3 = [3, 3, (6,6), 4, [[2, 2, [(0,0), (0,1), (1,1)]], [2, 2, [(0,1), (1,1), (1,0)]], [2, 2, [(0.0), (1,0), (1,1)]], [2, 2, [(1,0), (0,0), (0,1)]]]]
-p4 = [4, 3, (7,5), 2, [[1, 3, [(0,0), (1,0), (2,0)]], [3, 1, [(0,0), (0,1), (0,2)]]]]
-p5 = [5, 4, (6,6), 1, [[2, 2, [(0,0), (0,1), (1,1), (1,0)]]]]
-p6 = [6, 4, (6,5), 4, [[2, 3, [(0,1), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (1,1), (2,0)]], [2, 3, [(0,0), (0,1), (0,2), (1,1)]], [3, 2, [(0,1), (1,0), (1,1), (0,2)]]]]
-p7 = [7, 4, (7,4), 2, [[1, 4, [(0,0), (0,1), (0,2), (0,3)]], [4, 1, [(0,0), (1,0), (2,0), (3,0)]]]]
-p8 = [8, 4, (6,5), 8, [[2, 3, [(0,2), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (2,0), (2,1)]], [2, 3, [(0,0), (0,1), (0,2), (1,0)]], [3, 2, [(0,0), (0,1), (1,1), (2,1)]], [3, 2, [(0,0), (1,0), (1,1), (1,2)]], [2, 3, [(0,0), (0,1), (1,0), (2,0)]], [3, 2, [(0,0), (0,1), (0,2), (1,2)]], [2, 3, [(0,1), (1,1), (2,0), (2,1)]]]]
-p9 = [9, 4, (6,5), 4, [[2, 3, [(0,1), (0,2), (1,0), (1,1)]], [3, 2, [(0,0), (1,0), (1,1), (2,1)]], [2, 3, [(0,0), (0,1), (1,1), (1,2)]], [3, 2, [(0,1), (1,0), (1,1), (2,1)]]]]
-'''
-p1 = [1, 1, [7,7], 1, [[1, 1, [[0,0]]]]]
-p2 = [2, 2, [7,6], 2, [[1, 2, [[0,0], [0,1]]], [2, 1, [[0,0], [1,0]]]]]
-p3 = [3, 3, [6,6], 4, [[2, 2, [[0,0], [0,1], [1,1]]], [2, 2, [[0,1], [1,1], [1,0]]], [2, 2, [[0,0], [1,0], [1,1]]], [2, 2, [[1,0], [0,0], [0,1]]]]]
-p4 = [4, 3, [7,5], 2, [[1, 3, [[0,0], [1,0], [2,0]]], [3, 1, [[0,0], [0,1], [0,2]]]]]
-p5 = [5, 4, [6,6], 1, [[2, 2, [[0,0], [0,1], [1,1], [1,0]]]]]
-p6 = [6, 4, [6,5], 4, [[2, 3, [[0,1], [1,0], [1,1], [1,2]]], [3, 2, [[0,0], [1,0], [1,1], [2,0]]], [2, 3, [[0,0], [0,1], [0,2], [1,1]]], [3, 2, [[0,1], [1,0], [1,1], [0,2]]]]]
-p7 = [7, 4, [7,4], 2, [[1, 4, [[0,0], [0,1], [0,2], [0,3]]], [4, 1, [[0,0], [1,0], [2,0], [3,0]]]]]
-p8 = [8, 4, [6,5], 8, [[2, 3, [[0,2], [1,0], [1,1], [1,2]]], [3, 2, [[0,0], [1,0], [2,0], [2,1]]], [2, 3, [[0,0], [0,1], [0,2], [1,0]]], [3, 2, [[0,0], [0,1], [1,1], [2,1]]], [3, 2, [[0,0], [1,0], [1,1], [1,2]]], [2, 3, [[0,0], [0,1], [1,0], [2,0]]], [3, 2, [[0,0], [0,1], [0,2], [1,2]]], [2, 3, [[0,1], [1,1], [2,0], [2,1]]]]]
-p9 = [9, 4, [6,5], 4, [[2, 3, [[0,1], [0,2], [1,0], [1,1]]], [3, 2, [[0,0], [1,0], [1,1], [2,1]]], [2, 3, [[0,0], [0,1], [1,1], [1,2]]], [3, 2, [[0,1], [1,0], [1,1], [2,1]]]]]
+p1 = [1, 1, (8,8), 1, [[1, 1, [(0,0)]]]]
+p2 = [2, 2, (8,7), 2, [[1, 2, [(0,0), (0,1)]], [2, 1, [(0,0), (1,0)]]]]
+p3 = [3, 3, (7,7), 4, [[2, 2, [(0,0), (0,1), (1,1)]], [2, 2, [(0,1), (1,1), (1,0)]], [2, 2, [(0,0), (1,0), (1,1)]], [2, 2, [(1,0), (0,0), (0,1)]]]]
+p4 = [4, 3, (8,6), 2, [[1, 3, [(0,0), (1,0), (2,0)]], [3, 1, [(0,0), (0,1), (0,2)]]]]
+p5 = [5, 4, (7,7), 1, [[2, 2, [(0,0), (0,1), (1,1), (1,0)]]]]
+p6 = [6, 4, (7,6), 4, [[2, 3, [(0,1), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (1,1), (2,0)]], [2, 3, [(0,0), (0,1), (0,2), (1,1)]], [3, 2, [(0,1), (1,0), (1,1), (0,2)]]]]
+p7 = [7, 4, (8,5), 2, [[1, 4, [(0,0), (0,1), (0,2), (0,3)]], [4, 1, [(0,0), (1,0), (2,0), (3,0)]]]]
+p8 = [8, 4, (7,6), 8, [[2, 3, [(0,2), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (2,0), (2,1)]], [2, 3, [(0,0), (0,1), (0,2), (1,0)]], [3, 2, [(0,0), (0,1), (1,1), (2,1)]], [3, 2, [(0,0), (1,0), (1,1), (1,2)]], [2, 3, [(0,0), (0,1), (1,0), (2,0)]], [3, 2, [(0,0), (0,1), (0,2), (1,2)]], [2, 3, [(0,1), (1,1), (2,0), (2,1)]]]]
+p9 = [9, 4, (7,6), 4, [[2, 3, [(0,1), (0,2), (1,0), (1,1)]], [3, 2, [(0,0), (1,0), (1,1), (2,1)]], [2, 3, [(0,0), (0,1), (1,1), (1,2)]], [3, 2, [(0,1), (1,0), (1,1), (2,1)]]]]
 
 piece_list = [p1, p2, p3, p4, p5, p6, p7, p8, p9]
 
 piece_point = [1, 2, 3, 3, 4, 4, 4, 4, 4]
 
 #accumulated possible action for each piece
-action_marking = [0, 64, 176, 372, 468, 517, 685, 765, 1101, 1269]
+action_marking = [0, 64, 176, 372, 468, 517, 685, 765, 1101, 1269, 10000]
 
 
 class BlokusEnv(gym.Env):
@@ -53,7 +42,7 @@ class BlokusEnv(gym.Env):
         self.board_length = 8
         self.n_players = 2
         self.board_shape = (self.board_length, self.board_length)
-        self.piece_num = 8
+        self.piece_num = 9
         self.possible_action_num = 1269
         self.action_space = gym.spaces.Discrete(self.possible_action_num)
         self.observation_space = gym.spaces.Box(0, self.n_players, self.board_shape)
@@ -71,7 +60,7 @@ class BlokusEnv(gym.Env):
 
     @property
     def legal_actions(self):
-        legal_action = np.zeros(self.possible_action_num)  
+        legal_action = np.zeros(self.possible_action_num+1)
         for piece in [self.pieces[x] for x in range(self.piece_num) if self.current_player.pieces[x]==1]:
             for point in self.get_point(self.current_player.possible):
                 for pos in piece.pos_list:
@@ -80,7 +69,7 @@ class BlokusEnv(gym.Env):
                             r = point[0]+i
                             c = point[1]+j
                             if self.inboard(pos.h, pos.w, r, c) and self.chk_possible(point,r,c,pos) and self.chk_occupied(r,c,pos) and self.chk_adjacent(r,c,pos):
-                                action_num = action_marking[piece.id-1] + (pos.id-1)*piece.dim_size + (r-(pos.h-1))*(self.board_length-(pos.w-1)) + c-(pos.h-1) +1
+                                action_num = action_marking[piece.id-1] + (pos.id-1)*piece.dim_size + (r-(pos.h-1))*(self.board_length-(pos.w-1)) + c-(pos.w-1) +1
                                 legal_action[action_num] = 1
         return legal_action
 
@@ -95,11 +84,7 @@ class BlokusEnv(gym.Env):
 
     def chk_possible(self, possible, r, c, pos):
         for grid in pos.loc:
-            #print(type(grid),len(grid))
-            #print(grid[0], grid[1])
-            x,y = grid
-            x += r-(pos.h-1)
-            y += c-(pos.w-1)
+            x,y = r-(pos.h-1)+grid[0], c-(pos.w-1)+grid[1]
             new_grid = [x, y]
             if new_grid==possible:
                     return True
@@ -109,9 +94,7 @@ class BlokusEnv(gym.Env):
 
     def chk_occupied(self, r, c, pos):
         for grid in pos.loc:
-            x,y = grid
-            x += r-(pos.h-1)
-            y += c-(pos.w-1)
+            x,y = r-(pos.h-1)+grid[0], c-(pos.w-1)+grid[1]
             new_grid = [x, y]
             for point in self.get_point(self.board):
                 if new_grid==point:
@@ -122,8 +105,7 @@ class BlokusEnv(gym.Env):
 
     def chk_adjacent(self, r, c, pos):
         for grid in pos.loc:
-            x = r-(pos.h-1)+grid[0]
-            y = c-(pos.w-1)+grid[1]
+            x,y = r-(pos.h-1)+grid[0], c-(pos.w-1)+grid[1]
             new_grid = [x, y]
             for point in self.get_point(self.current_player.adjacents):
                 if new_grid==point:
@@ -187,7 +169,9 @@ class BlokusEnv(gym.Env):
     def update_board(self, action):
         id, loc_h, loc_w, pos = action[0], action[1], action[2], action[3]
         h, w, loc = pos.h, pos.w, pos.loc
+        #print(id, loc_h, loc_w, h, w, loc)
         for grid in loc:
+            print(grid[0]+loc_h-(h-1), grid[1]+loc_w-(w-1))
             self.board[grid[0]+loc_h-(h-1)][grid[1]+loc_w-(w-1)] = self.current_player.id
 
 
@@ -224,21 +208,23 @@ class BlokusEnv(gym.Env):
         #translated_action int->id,loc_h,loc_w,pos
         translated_action = []
         id = None
-        for id in range(9):
-            if action > action_marking[id] and action < action_marking[id+1]:
-                id+=1
-                action = action-action_marking[id-1]
-                translated_action.append(id)
+        for id in range(10):
+            if action > action_marking[id] and action <= action_marking[id+1]:
+                action = action-action_marking[id]
+                translated_action.append(id+1)
                 break
 
         pos_num = (action-1) // self.pieces[id].dim_size + 1
-        pos = self.pieces[id].pos_list[pos_num]
+        pos = self.pieces[id].pos_list[pos_num-1]
         loc_num = (action-1) % self.pieces[id].dim_size + 1
-        loc_h = (loc_num-1) // self.pieces[id].dim[1] + (pos.h-1)
-        loc_w = (loc_num-1) % self.pieces[id].dim[1] + (pos.w-1)
+        loc_h = (loc_num-1) // (self.board_length-(pos.w-1)) + (pos.h-1)
+        loc_w = (loc_num-1) %  (self.board_length-(pos.w-1)) + (pos.w-1)
         translated_action.append(loc_h)        
         translated_action.append(loc_w)
         translated_action.append(pos)
+        print(translated_action)
+        print(pos)
+        #print(id)
         return translated_action
 
 
@@ -246,6 +232,10 @@ class BlokusEnv(gym.Env):
         #print current game state
         #print current board state
         #print legal_actions
+
+        #print(self.translate_action(121))
+        #print(self.update_board(self.translate_action(1)))
+
         logger.debug('')
         if close:
             return
@@ -255,7 +245,7 @@ class BlokusEnv(gym.Env):
             logger.debug(f"It is Player {self.current_player.id}'s turn to move")
 
         for line in self.board:
-                logger.debug(line)
+            logger.debug(line)
 
         if self.verbose:
             pass
