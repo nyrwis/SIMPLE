@@ -1,4 +1,4 @@
-# Modified code from https://github.com/DerekGloudemans/Blokus-Reinforcement-Learning
+# referenced code from https://github.com/DerekGloudemans/Blokus-Reinforcement-Learning
 
 import gym
 import numpy as np
@@ -169,7 +169,7 @@ class BlokusEnv(gym.Env):
     def update_board(self, action):
         id, loc_h, loc_w, pos = action[0], action[1], action[2], action[3]
         h, w, loc = pos.h, pos.w, pos.loc
-        #print(id, loc_h, loc_w, h, w, loc)
+        print(id, loc_h, loc_w, h, w, loc)
         for grid in loc:
             print(grid[0]+loc_h-(h-1), grid[1]+loc_w-(w-1))
             self.board[grid[0]+loc_h-(h-1)][grid[1]+loc_w-(w-1)] = self.current_player.id
@@ -222,8 +222,8 @@ class BlokusEnv(gym.Env):
         translated_action.append(loc_h)        
         translated_action.append(loc_w)
         translated_action.append(pos)
-        print(translated_action)
-        print(pos)
+        #print(translated_action)
+        #print(pos)
         #print(id)
         return translated_action
 
@@ -245,6 +245,26 @@ class BlokusEnv(gym.Env):
             logger.debug(f"It is Player {self.current_player.id}'s turn to move")
 
         for line in self.board:
+            logger.debug(line)
+
+        logger.debug(f'occupied')
+
+        for line in self.current_player.occupied:
+            logger.debug(line)
+
+        logger.debug(f'corners')
+
+        for line in self.current_player.corners:
+            logger.debug(line)
+
+        logger.debug(f'adjacents')
+
+        for line in self.current_player.adjacents:
+            logger.debug(line)
+
+        logger.debug(f'possible')
+
+        for line in self.current_player.possible:
             logger.debug(line)
 
         if self.verbose:

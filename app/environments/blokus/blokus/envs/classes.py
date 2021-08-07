@@ -53,6 +53,7 @@ class Player():
     def delete_piece(self, action):
         id = action[0]
         self.pieces[id-1] = 0
+        print(id)
 
 
     def occupied_update(self, action):
@@ -61,7 +62,7 @@ class Player():
         i,j = loc_h-(pos.h-1), loc_w-(pos.w-1)
         for pos in pos.loc:
             grid = list(pos)
-            print(grid[0]+i, grid[1]+j)
+            #print(grid[0]+i, grid[1]+j)
             self.occupied[grid[0]+i, grid[1]+j] = 1
 
 
@@ -91,7 +92,7 @@ class Player():
                 x = grid[0]+d[0]
                 y =  grid[1]+d[1]
                 if x>=0 and x<8 and y>=0 and y<8:
-                    self.corners[x, y] = 1
+                    self.adjacents[x, y] = 1
 
 
     def possible_update(self, action, board):
