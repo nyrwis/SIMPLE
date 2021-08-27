@@ -97,5 +97,13 @@ class Player():
 
     def possible_update(self, action, board):
         self.possible = self.corners - self.occupied - self.adjacents - board
+        print(self.id)
+        print(self.possible)
         np.clip(self.possible, 0, 1, out=self.possible)
+        print(self.possible)
 
+    def turn_update(self, board):
+        self.possible = self.possible - board
+        np.clip(self.possible, 0, 1, out=self.possible)
+        print(f"player {self.id}'s possible")
+        print(self.possible)

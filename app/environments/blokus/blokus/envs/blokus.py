@@ -16,12 +16,12 @@ from .classes import Piece, Player
 p1 = [1, 1, (8,8), 1, [[1, 1, [(0,0)]]]]
 p2 = [2, 2, (8,7), 2, [[1, 2, [(0,0), (0,1)]], [2, 1, [(0,0), (1,0)]]]]
 p3 = [3, 3, (7,7), 4, [[2, 2, [(0,0), (0,1), (1,1)]], [2, 2, [(0,1), (1,1), (1,0)]], [2, 2, [(0,0), (1,0), (1,1)]], [2, 2, [(1,0), (0,0), (0,1)]]]]
-p4 = [4, 3, (8,6), 2, [[1, 3, [(0,0), (1,0), (2,0)]], [3, 1, [(0,0), (0,1), (0,2)]]]]
+p4 = [4, 3, (8,6), 2, [[1, 3, [(0,0), (0,1), (0,2)]], [3, 1, [(0,0), (1,0), (2,0)]]]]
 p5 = [5, 4, (7,7), 1, [[2, 2, [(0,0), (0,1), (1,1), (1,0)]]]]
-p6 = [6, 4, (7,6), 4, [[2, 3, [(0,1), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (1,1), (2,0)]], [2, 3, [(0,0), (0,1), (0,2), (1,1)]], [3, 2, [(0,1), (1,0), (1,1), (0,2)]]]]
+p6 = [6, 4, (7,6), 4, [[2, 3, [(0,1), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (1,1), (2,0)]], [2, 3, [(0,0), (0,1), (0,2), (1,1)]], [3, 2, [(0,1), (1,0), (1,1), (2,1)]]]]
 p7 = [7, 4, (8,5), 2, [[1, 4, [(0,0), (0,1), (0,2), (0,3)]], [4, 1, [(0,0), (1,0), (2,0), (3,0)]]]]
-p8 = [8, 4, (7,6), 8, [[2, 3, [(0,2), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (2,0), (2,1)]], [2, 3, [(0,0), (0,1), (0,2), (1,0)]], [3, 2, [(0,0), (0,1), (1,1), (2,1)]], [3, 2, [(0,0), (1,0), (1,1), (1,2)]], [2, 3, [(0,0), (0,1), (1,0), (2,0)]], [3, 2, [(0,0), (0,1), (0,2), (1,2)]], [2, 3, [(0,1), (1,1), (2,0), (2,1)]]]]
-p9 = [9, 4, (7,6), 4, [[2, 3, [(0,1), (0,2), (1,0), (1,1)]], [3, 2, [(0,0), (1,0), (1,1), (2,1)]], [2, 3, [(0,0), (0,1), (1,1), (1,2)]], [3, 2, [(0,1), (1,0), (1,1), (2,1)]]]]
+p8 = [8, 4, (7,6), 8, [[2, 3, [(0,2), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (2,0), (2,1)]], [2, 3, [(0,0), (0,1), (0,2), (1,0)]], [3, 2, [(0,0), (0,1), (1,1), (2,1)]], [2, 3, [(0,0), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (0,1), (1,0), (2,0)]], [2, 3, [(0,0), (0,1), (0,2), (1,2)]], [3, 2, [(0,1), (1,1), (2,0), (2,1)]]]]
+p9 = [9, 4, (7,6), 4, [[2, 3, [(0,1), (0,2), (1,0), (1,1)]], [3, 2, [(0,0), (1,0), (1,1), (2,1)]], [2, 3, [(0,0), (0,1), (1,1), (1,2)]], [3, 2, [(0,1), (1,0), (1,1), (2,0)]]]]
 
 piece_list = [p1, p2, p3, p4, p5, p6, p7, p8, p9]
 
@@ -120,13 +120,23 @@ class BlokusEnv(gym.Env):
 
 
     def get_point(self, board):
+        #original
         point_list = []
         for i in range(self.board_length):
             for j in range(self.board_length):
-                if board[i][j] == 1:
+                if board[i][j] != 0:
                     point = [i, j]
                     point_list.append(point)
         return point_list
+
+
+    def calc_reward(self, board, id):
+        tot_point=0
+        for i in range(self.board_length):
+            for j in range(self.board_length):
+                if board[i][j] == id:
+                    tot_point += 1
+        return tot_point 
 
 
     def reset(self):
@@ -144,12 +154,20 @@ class BlokusEnv(gym.Env):
         logger.debug(f'\n\n---- NEW GAME ----')
         return self.observation
 
+    def all_player_update(self):
+        for player in self.players:
+            player.turn_update(self.board)
 
     def step(self, action):
         reward = [0,0]
         self.update_board(self.translate_action(action))
         self.current_player.update(self.translate_action(action), self.board)
-
+        self.all_player_update()
+        
+        done = self.change_turn()
+        
+        
+        '''
         done = self.change_turn()
 
         while not self.get_point(self.current_player.possible):
@@ -157,6 +175,7 @@ class BlokusEnv(gym.Env):
             done = self.change_turn()
             if done==True:
                 break
+        '''
 
         observation = self.observation
 
@@ -176,6 +195,7 @@ class BlokusEnv(gym.Env):
 
 
     def choose_winner(self):
+        '''
         ans = 0
         score=[]
         for player in self.players:
@@ -190,9 +210,22 @@ class BlokusEnv(gym.Env):
             score = [-1,1] 
         else:
             score = [0,0]
+        '''
+        ans = 0
+        score=[]
+        for i in range(2):
+            score.append(self.calc_reward(self.board, i))
 
+        if score[0]>score[1]:
+            score = [1,-1]
+        elif score[0]<score[1]:
+            score = [-1,1] 
+        else:
+            score = [0,0]
+        return score
 
     def change_turn(self):
+        '''
         done = True
         for i in range(self.n_players):
             if self.left_players[i] == 1:
@@ -202,6 +235,16 @@ class BlokusEnv(gym.Env):
         self.current_player_num = (self.current_player_num+1)%self.n_players
         while self.left_players[self.current_player_num]==0:
             self.current_player_num = (self.current_player_num+1)%self.n_players
+        return done
+        '''
+        done = False
+        self.current_player_num = (self.current_player_num+1)%self.n_players
+        #print("legal action!!!!!")
+        #print(self.legal_actions)
+        if np.count_nonzero(self.legal_actions) == 0:
+            done = True
+            return done
+
         return done
 
     def translate_action(self, action):
