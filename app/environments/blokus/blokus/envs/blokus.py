@@ -53,14 +53,35 @@ class BlokusEnv(gym.Env):
     def observation(self):
         #combine current board state, legal_action
         combined_observation = np.array(self.board).flatten()
+        '''
+        print('board')
+        print(np.shape(combined_observation))
+        print(combined_observation)
+        '''
         x = np.array(self.legal_actions)
+        '''
+        print('legal_actions')
+        print(np.shape(x))
+        print(x)
+        '''
         combined_observation = np.append(combined_observation, x)
+        '''
+        print('combined_observation')
+        print(np.shape(combined_observation))
+        print(combined_observation)
+        '''
+        #combined_observation = np.array(combined_observation)
+        '''
+        print('\n\ntype')
+        print(type(combined_observation))
+        print('\n\n')
+        '''
         return combined_observation
     
 
     @property
     def legal_actions(self):
-        legal_action = np.zeros(self.possible_action_num+1)
+        legal_action = np.zeros(self.possible_action_num)
         for piece in [self.pieces[x] for x in range(self.piece_num) if self.current_player.pieces[x]==1]:
             for point in self.get_point(self.current_player.possible):
                 for pos in piece.pos_list:
@@ -177,12 +198,18 @@ class BlokusEnv(gym.Env):
                 break
         '''
 
-        observation = self.observation
+        #observation = self.observation
 
         if done:
             reward = self.choose_winner()
 
-        return observation, reward, done, {}
+        '''
+        print('observation')
+        print(self.observation)
+        print(np.shape(self.observation))
+        '''
+
+        return self.observation, reward, done, {}
 
 
     def update_board(self, action):

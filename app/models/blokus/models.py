@@ -3,25 +3,41 @@ import tensorflow as tf
 tf.get_logger().setLevel('INFO')
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
-from tensorflow.keras.layers import BatchNormalization, Activation, Flatten, Conv2D, Add, Dense, Dropout
-
+from tensorflow.keras.layers import BatchNormalization, Activation, Flatten, Add, Dense, Multiply, Concatenate, Lambda
+import tensorflow.keras.backend as K
 from stable_baselines.common.policies import ActorCriticPolicy
-from stable_baselines.common.distributions import CategoricalProbabilityDistributionType, CategoricalProbabilityDistribution
+from stable_baselines.common.distributions import CategoricalProbabilityDistribution
 
+
+ACTIONS = 1269
+FEATURE_SIZE = 64
+DEPTH = 5
+VALUE_DEPTH = 1
+POLICY_DEPTH = 1
 
 class CustomPolicy(ActorCriticPolicy):
     def __init__(self, sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=False, **kwargs):
         super(CustomPolicy, self).__init__(sess, ob_space, ac_space, n_env, n_steps, n_batch, reuse=reuse, scale=True)
 
         with tf.variable_scope("model", reuse=reuse):
-            
-            extracted_features = resnet_extractor(self.processed_obs, **kwargs)
-            self._policy = policy_head(extracted_features)
-            self._value_fn, self.q_value = value_head(extracted_features)
 
+
+            obs, legal_actions = split_input(self.processed_obs, ACTIONS)
+            
+            print(self.processed_obs)
+            
+            
+            print(type(obs))
+            print(obs)
+            print(type(legal_actions))
+            print(legal_actions)
+            
+            extracted_features = resnet_extractor(obs, **kwargs)
+
+            self._policy = policy_head(extracted_features, legal_actions)
+            self._value_fn, self.q_value = value_head(extracted_features)
             self._proba_distribution  = CategoricalProbabilityDistribution(self._policy)
 
-            
         self._setup_init()
 
     def step(self, obs, state=None, mask=None, deterministic=False):
@@ -40,56 +56,62 @@ class CustomPolicy(ActorCriticPolicy):
         return self.sess.run(self.value_flat, {self.obs_ph: obs})
 
 
+def split_input(obs, split):
+    return   obs[:,:-split], obs[:,-split:]
+
 
 def value_head(y):
-    y = convolutional(y, 4, 1)
-    y = Flatten()(y)
-    y = dense(y, 128, batch_norm = False)
+    for _ in range(VALUE_DEPTH):
+        y = dense(y, FEATURE_SIZE)
     vf = dense(y, 1, batch_norm = False, activation = 'tanh', name='vf')
-    q = dense(y, 7, batch_norm = False, activation = 'tanh', name='q')
+    q = dense(y, ACTIONS, batch_norm = False, activation = 'tanh', name='q')
     return vf, q
 
 
-def policy_head(y):
-    y = convolutional(y, 4, 1)
-    y = Flatten()(y)
-    policy = dense(y, 7, batch_norm = False, activation = None, name='pi')
+def policy_head(y, legal_actions):
+
+    for _ in range(POLICY_DEPTH):
+        y = dense(y, FEATURE_SIZE)
+    policy = dense(y, ACTIONS, batch_norm = False, activation = None, name='pi')
+    
+    mask = Lambda(lambda x: (1 - x) * -1e8)(legal_actions)   
+        
+    print(type(legal_actions))
+    print(legal_actions)
+
+    print(type(policy))
+    print(policy)
+
+    print(type(mask))
+    print(mask)
+    
+    policy = Add()([policy, mask])
     return policy
 
 
 def resnet_extractor(y, **kwargs):
-
-    y = convolutional(y, 32, 4)
-    y = residual(y, 32, 4)
-    y = residual(y, 32, 4)
-    y = residual(y, 32, 4)
+    y = dense(y, FEATURE_SIZE)
+    for _ in range(DEPTH):
+        y = residual(y, FEATURE_SIZE)
 
     return y
 
 
 
-def convolutional(y, filters, kernel_size):
-    y = Conv2D(filters, kernel_size=kernel_size, strides=1, padding='same')(y)
-    y = BatchNormalization(momentum = 0.9)(y)
-    y = Activation('relu')(y)
-    return y
 
-def residual(y, filters, kernel_size):
+
+def residual(y, filters):
     shortcut = y
 
-    y = Conv2D(filters, kernel_size=kernel_size, strides=1, padding='same')(y)
-    y = BatchNormalization(momentum = 0.9)(y)
-    y = Activation('relu')(y)
-
-    y = Conv2D(filters, kernel_size=kernel_size, strides=1, padding='same')(y)
-    y = BatchNormalization(momentum = 0.9)(y)
+    y = dense(y, filters)
+    y = dense(y, filters, activation = None)
     y = Add()([shortcut, y])
     y = Activation('relu')(y)
 
     return y
 
 
-def dense(y, filters, batch_norm = True, activation = 'relu', name = None):
+def dense(y, filters, batch_norm = False, activation = 'relu', name = None):
 
     if batch_norm or activation:
         y = Dense(filters)(y)
