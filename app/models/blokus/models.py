@@ -21,16 +21,7 @@ class CustomPolicy(ActorCriticPolicy):
 
         with tf.variable_scope("model", reuse=reuse):
 
-
             obs, legal_actions = split_input(self.processed_obs, ACTIONS)
-            
-            print(self.processed_obs)
-            
-            
-            print(type(obs))
-            print(obs)
-            print(type(legal_actions))
-            print(legal_actions)
             
             extracted_features = resnet_extractor(obs, **kwargs)
 
@@ -58,7 +49,7 @@ class CustomPolicy(ActorCriticPolicy):
 
 def split_input(obs, split):
     return   obs[:,:-split], obs[:,-split:]
-
+    #return   obs[:, :, :-split], obs[:, :, -split:]
 
 def value_head(y):
     for _ in range(VALUE_DEPTH):
@@ -75,16 +66,7 @@ def policy_head(y, legal_actions):
     policy = dense(y, ACTIONS, batch_norm = False, activation = None, name='pi')
     
     mask = Lambda(lambda x: (1 - x) * -1e8)(legal_actions)   
-        
-    print(type(legal_actions))
-    print(legal_actions)
 
-    print(type(policy))
-    print(policy)
-
-    print(type(mask))
-    print(mask)
-    
     policy = Add()([policy, mask])
     return policy
 

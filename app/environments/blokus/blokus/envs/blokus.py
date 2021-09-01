@@ -45,7 +45,7 @@ class BlokusEnv(gym.Env):
         self.piece_num = 9
         self.possible_action_num = 1269
         self.action_space = gym.spaces.Discrete(self.possible_action_num)
-        self.observation_space = gym.spaces.Box(0, self.n_players, self.board_shape)
+        self.observation_space = gym.spaces.Box(0, 2, (self.board_length*self.board_length+1269,))
         self.verbose = verbose
 
 
@@ -53,31 +53,12 @@ class BlokusEnv(gym.Env):
     def observation(self):
         #combine current board state, legal_action
         combined_observation = np.array(self.board).flatten()
-        '''
-        print('board')
-        print(np.shape(combined_observation))
-        print(combined_observation)
-        '''
         x = np.array(self.legal_actions)
-        '''
-        print('legal_actions')
-        print(np.shape(x))
-        print(x)
-        '''
         combined_observation = np.append(combined_observation, x)
-        '''
-        print('combined_observation')
-        print(np.shape(combined_observation))
-        print(combined_observation)
-        '''
-        #combined_observation = np.array(combined_observation)
-        '''
-        print('\n\ntype')
-        print(type(combined_observation))
-        print('\n\n')
-        '''
+
         return combined_observation
-    
+
+
 
     @property
     def legal_actions(self):
@@ -203,21 +184,13 @@ class BlokusEnv(gym.Env):
         if done:
             reward = self.choose_winner()
 
-        '''
-        print('observation')
-        print(self.observation)
-        print(np.shape(self.observation))
-        '''
-
         return self.observation, reward, done, {}
 
 
     def update_board(self, action):
         id, loc_h, loc_w, pos = action[0], action[1], action[2], action[3]
         h, w, loc = pos.h, pos.w, pos.loc
-        print(id, loc_h, loc_w, h, w, loc)
         for grid in loc:
-            print(grid[0]+loc_h-(h-1), grid[1]+loc_w-(w-1))
             self.board[grid[0]+loc_h-(h-1)][grid[1]+loc_w-(w-1)] = self.current_player.id
 
 
@@ -313,10 +286,12 @@ class BlokusEnv(gym.Env):
             logger.debug(f'GAME OVER')
         else:
             logger.debug(f"It is Player {self.current_player.id}'s turn to move")
-
+        
+        
         for line in self.board:
             logger.debug(line)
 
+        '''
         logger.debug(f'occupied')
 
         for line in self.current_player.occupied:
@@ -336,6 +311,7 @@ class BlokusEnv(gym.Env):
 
         for line in self.current_player.possible:
             logger.debug(line)
+        '''
 
         if self.verbose:
             pass
