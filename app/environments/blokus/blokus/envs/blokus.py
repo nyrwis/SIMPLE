@@ -133,13 +133,13 @@ class BlokusEnv(gym.Env):
 
 
     def calc_reward(self, board, id):
-        print(board)
+        #print(board)
         tot_point=0
-        print("id")
+        #print("id")
         for i in range(self.board_length):
             for j in range(self.board_length):
                 if board[i][j] == id:
-                    print(i,j)
+                    #print(i,j)
                     tot_point += 1
         return tot_point 
 
@@ -218,7 +218,7 @@ class BlokusEnv(gym.Env):
         score=[]
         for i in range(2):
             score.append(self.calc_reward(self.board, i+1))
-        print(score) 
+        #print(score) 
         if score[0]>score[1]:
             score = [1,-1]
         elif score[0]<score[1]:
