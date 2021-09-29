@@ -14,5 +14,6 @@ services:
         container_name: selfplay
         cap_add:
             - SYS_PTRACE
-        
-
+#        environment:
+#            - NVIDIA_VISIBLE_DEVICES=all
+#        runtime: nvidia

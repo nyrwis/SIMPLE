@@ -4,8 +4,9 @@ class Piece():
     def __init__(self, info):
         self.id = info[0]
         self.n = info[1]
-        self.dim = info[2]
-        self.dim_size = self.dim[0]*self.dim[1]
+        #self.dim = info[2]
+        #self.dim_size = self.dim[0]*self.dim[1]
+        self.dim_size = info[2]
         self.pos = info[3]
         self.pos_list = []
         num=1
@@ -38,7 +39,7 @@ class Player():
         if self.id==1:
             self.possible[0][0] = 1
         elif self.id==2:
-            self.possible[7][7] = 1
+            self.possible[13][13] = 1
         #self.possible[0][0] = self.possible[0][7] = self.possible[7][0] = self.possible[7][7] = 1
 
 
@@ -75,7 +76,7 @@ class Player():
             for d in dir:
                 x = grid[0]+d[0]
                 y =  grid[1]+d[1]
-                if x>=0 and x<8 and y>=0 and y<8:
+                if x>=0 and x<14 and y>=0 and y<14:
                     self.corners[x, y] = 1
             
 
@@ -90,7 +91,7 @@ class Player():
             for d in dir:
                 x = grid[0]+d[0]
                 y =  grid[1]+d[1]
-                if x>=0 and x<8 and y>=0 and y<8:
+                if x>=0 and x<14 and y>=0 and y<14:
                     self.adjacents[x, y] = 1
 
 

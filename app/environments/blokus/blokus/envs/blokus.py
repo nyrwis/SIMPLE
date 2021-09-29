@@ -2,6 +2,7 @@
 
 import gym
 import numpy as np
+from numba import jit
 
 import config
 import copy
@@ -13,22 +14,36 @@ from .classes import Piece, Player
 
 #information of each piece
 #[id, num of spaces each piece cover, (num of possible grid location in a row, num of possible grid location in a column), possible position, (grid_h, grid_w, grid location)]
-p1 = [1, 1, (8,8), 1, [[1, 1, [(0,0)]]]]
-p2 = [2, 2, (8,7), 2, [[1, 2, [(0,0), (0,1)]], [2, 1, [(0,0), (1,0)]]]]
-p3 = [3, 3, (7,7), 4, [[2, 2, [(0,0), (0,1), (1,1)]], [2, 2, [(0,1), (1,1), (1,0)]], [2, 2, [(0,0), (1,0), (1,1)]], [2, 2, [(1,0), (0,0), (0,1)]]]]
-p4 = [4, 3, (8,6), 2, [[1, 3, [(0,0), (0,1), (0,2)]], [3, 1, [(0,0), (1,0), (2,0)]]]]
-p5 = [5, 4, (7,7), 1, [[2, 2, [(0,0), (0,1), (1,1), (1,0)]]]]
-p6 = [6, 4, (7,6), 4, [[2, 3, [(0,1), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (1,1), (2,0)]], [2, 3, [(0,0), (0,1), (0,2), (1,1)]], [3, 2, [(0,1), (1,0), (1,1), (2,1)]]]]
-p7 = [7, 4, (8,5), 2, [[1, 4, [(0,0), (0,1), (0,2), (0,3)]], [4, 1, [(0,0), (1,0), (2,0), (3,0)]]]]
-p8 = [8, 4, (7,6), 8, [[2, 3, [(0,2), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (1,0), (2,0), (2,1)]], [2, 3, [(0,0), (0,1), (0,2), (1,0)]], [3, 2, [(0,0), (0,1), (1,1), (2,1)]], [2, 3, [(0,0), (1,0), (1,1), (1,2)]], [3, 2, [(0,0), (0,1), (1,0), (2,0)]], [2, 3, [(0,0), (0,1), (0,2), (1,2)]], [3, 2, [(0,1), (1,1), (2,0), (2,1)]]]]
-p9 = [9, 4, (7,6), 4, [[2, 3, [(0,1), (0,2), (1,0), (1,1)]], [3, 2, [(0,0), (1,0), (1,1), (2,1)]], [2, 3, [(0,0), (0,1), (1,1), (1,2)]], [3, 2, [(0,1), (1,0), (1,1), (2,0)]]]]
+p1 = [1, 1, 196, 1, [[1, 1, [(0, 0)]]]]
+p2 = [2, 2, 182, 2, [[1, 2, [(0, 0), (0, 1)]], [2, 1, [(0, 0), (1, 0)]]]]
+p3 = [3, 3, 169, 4, [[2, 2, [(0, 0), (0, 1), (1, 0)]], [2, 2, [(0, 0), (0, 1), (1, 1)]], [2, 2, [(0, 1), (1, 0), (1, 1)]], [2, 2, [(0, 0), (1, 0), (1, 1)]]]]
+p4 = [4, 3, 168, 2, [[1, 3, [(0, 0), (0, 1), (0, 2)]], [3, 1, [(0, 0), (1, 0), (2, 0)]]]]
+p5 = [5, 4, 169, 1, [[2, 2, [(0, 0), (0, 1), (1, 0), (1, 1)]]]]
+p6 = [6, 4, 156, 4, [[2, 3, [(0, 1), (1, 0), (1, 1), (1, 2)]], [3, 2, [(0, 0), (1, 0), (1, 1), (2, 0)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 1)]], [3, 2, [(0, 1), (1, 0), (1, 1), (2, 1)]]]]
+p7 = [7, 4, 154, 2, [[1, 4, [(0, 0), (0, 1), (0, 2), (0, 3)]], [4, 1, [(0, 0), (1, 0), (2, 0), (3, 0)]]]]
+p8 = [8, 4, 156, 8, [[2, 3, [(0, 0), (1, 0), (1, 1), (1, 2)]], [3, 2, [(0, 0), (0, 1), (1, 0), (2, 0)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 2)]], [3, 2, [(0, 1), (1, 1), (2, 0), (2, 1)]], [2, 3, [(0, 2), (1, 0), (1, 1), (1, 2)]], [3, 2, [(0, 0), (1, 0), (2, 0), (2, 1)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 0)]], [3, 2, [(0, 0), (0, 1), (1, 1), (2, 1)]]]]
+p9 = [9, 4, 156, 4, [[2, 3, [(0, 0), (0, 1), (1, 1), (1, 2)]], [3, 2, [(0, 1), (1, 0), (1, 1), (2, 0)]], [2, 3, [(0, 1), (0, 2), (1, 0), (1, 1)]], [3, 2, [(0, 0), (1, 0), (1, 1), (2, 1)]]]]
+p10 = [10, 5, 143, 8, [[2, 4, [(0, 3), (1, 0), (1, 1), (1, 2), (1, 3)]], [4, 2, [(0, 0), (1, 0), (2, 0), (3, 0), (3, 1)]], [2, 4, [(0, 0), (0, 1), (0, 2), (0, 3), (1, 0)]], [4, 2, [(0, 0), (0, 1), (1, 1), (2, 1), (3, 1)]], [2, 4, [(0, 0), (1, 0), (1, 1), (1, 2), (1, 3)]], [4, 2, [(0, 0), (0, 1), (1, 0), (2, 0), (3, 0)]], [2, 4, [(0, 0), (0, 1), (0, 2), (0, 3), (1, 3)]], [4, 2, [(0, 1), (1, 1), (2, 1), (3, 0), (3, 1)]]]]
+p11 = [11, 5, 144, 4, [[3, 3, [(0, 1), (1, 1), (2, 0), (2, 1), (2, 2)]], [3, 3, [(0, 0), (1, 0), (1, 1), (1, 2), (2, 0)]], [3, 3, [(0, 0), (0, 1), (0, 2), (1, 1), (2, 1)]], [3, 3, [(0, 2), (1, 0), (1, 1), (1, 2), (2, 2)]]]]
+p12 = [12, 5, 144, 4, [[3, 3, [(0, 2), (1, 2), (2, 0), (2, 1), (2, 2)]], [3, 3, [(0, 0), (1, 0), (2, 0), (2, 1), (2, 2)]], [3, 3, [(0, 0), (0, 1), (0, 2), (1, 0), (2, 0)]], [3, 3, [(0, 0), (0, 1), (0, 2), (1, 2), (2, 2)]]]]
+p13 = [13, 5, 143, 8, [[2, 4, [(0, 0), (0, 1), (0, 2), (1, 2), (1, 3)]], [4, 2, [(0, 1), (1, 1), (2, 0), (2, 1), (3, 0)]], [2, 4, [(0, 0), (0, 1), (1, 1), (1, 2), (1, 3)]], [4, 2, [(0, 1), (1, 0), (1, 1), (2, 0), (3, 0)]], [2, 4, [(0, 1), (0, 2), (0, 3), (1, 0), (1, 1)]], [4, 2, [(0, 0), (1, 0), (1, 1), (2, 1), (3, 1)]], [2, 4, [(0, 2), (0, 3), (1, 0), (1, 1), (1, 2)]], [4, 2, [(0, 0), (1, 0), (2, 0), (2, 1), (3, 1)]]]]
+p14 = [14, 5, 144, 4, [[3, 3, [(0, 0), (1, 0), (1, 1), (1, 2), (2, 2)]], [3, 3, [(0, 1), (0, 2), (1, 1), (2, 0), (2, 1)]], [3, 3, [(0, 2), (1, 0), (1, 1), (1, 2), (2, 0)]], [3, 3, [(0, 0), (0, 1), (1, 1), (2, 1), (2, 2)]]]]
+p15 = [15, 5, 140, 2, [[5, 1, [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0)]], [1, 5, [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)]]]]
+p16 = [16, 5, 156, 8, [[3, 2, [(0, 1), (1, 0), (1, 1), (2, 0), (2, 1)]], [2, 3, [(0, 0), (0, 1), (1, 0), (1, 1), (1, 2)]], [3, 2, [(0, 0), (0, 1), (1, 0), (1, 1), (2, 0)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 1), (1, 2)]], [3, 2, [(0, 0), (1, 0), (1, 1), (2, 0), (2, 1)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1)]], [3, 2, [(0, 0), (0, 1), (1, 0), (1, 1), (2, 1)]], [2, 3, [(0, 1), (0, 2), (1, 0), (1, 1), (1, 2)]]]]
+p17 = [17, 5, 144, 4, [[3, 3, [(0, 0), (0, 1), (1, 1), (1, 2), (2, 2)]], [3, 3, [(0, 2), (1, 1), (1, 2), (2, 0), (2, 1)]], [3, 3, [(0, 0), (1, 0), (1, 1), (2, 1), (2, 2)]], [3, 3, [(0, 1), (0, 2), (1, 0), (1, 1), (2, 0)]]]]
+p18 = [18, 5, 156, 4, [[3, 2, [(0, 0), (0, 1), (1, 1), (2, 0), (2, 1)]], [2, 3, [(0, 0), (0, 2), (1, 0), (1, 1), (1, 2)]], [3, 2, [(0, 0), (0, 1), (1, 0), (2, 0), (2, 1)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 0), (1, 2)]]]]
+p19 = [19, 5, 144, 8, [[3, 3, [(0, 0), (0, 1), (1, 1), (1, 2), (2, 1)]], [3, 3, [(0, 2), (1, 0), (1, 1), (1, 2), (2, 1)]], [3, 3, [(0, 1), (1, 0), (1, 1), (2, 1), (2, 2)]], [3, 3, [(0, 1), (1, 0), (1, 1), (1, 2), (2, 0)]], [3, 3, [(0, 1), (0, 2), (1, 0), (1, 1), (2, 1)]], [3, 3, [(0, 1), (1, 0), (1, 1), (1, 2), (2, 2)]], [3, 3, [(0, 1), (1, 1), (1, 2), (2, 0), (2, 1)]], [3, 3, [(0, 0), (1, 0), (1, 1), (1, 2), (2, 1)]]]]
+p20 = [20, 5, 144, 1, [[3, 3, [(0, 1), (1, 0), (1, 1), (1, 2), (2, 1)]]]]
+p21 = [21, 5, 143, 8, [[2, 4, [(0, 2), (1, 0), (1, 1), (1, 2), (1, 3)]], [4, 2, [(0, 0), (1, 0), (2, 0), (2, 1), (3, 0)]], [2, 4, [(0, 0), (0, 1), (0, 2), (0, 3), (1, 1)]], [4, 2, [(0, 1), (1, 0), (1, 1), (2, 1), (3, 1)]], [2, 4, [(0, 1), (1, 0), (1, 1), (1, 2), (1, 3)]], [4, 2, [(0, 0), (1, 0), (1, 1), (2, 0), (3, 0)]], [2, 4, [(0, 0), (0, 1), (0, 2), (0, 3), (1, 2)]], [4, 2, [(0, 1), (1, 1), (2, 0), (2, 1), (3, 1)]]]]
 
-piece_list = [p1, p2, p3, p4, p5, p6, p7, p8, p9]
 
-piece_point = [1, 2, 3, 3, 4, 4, 4, 4, 4]
+piece_list = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21]
+
+piece_point = [1, 2, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 
 #accumulated possible action for each piece
-action_marking = [0, 64, 176, 372, 468, 517, 685, 765, 1101, 1269, 10000]
+#action_marking = [0, 64, 176, 372, 468, 517, 685, 765, 1101, 1269, 10000]
+action_marking = [0, 196, 560, 1236, 1572, 1741, 2365, 2673, 3921, 4545, 5689, 6265, 6841, 7985, 8561, 8841, 10089, 10665, 11289, 12441, 12585, 13729, 20000]
 
 
 class BlokusEnv(gym.Env):
@@ -39,16 +54,16 @@ class BlokusEnv(gym.Env):
         self.name = 'blokus'
         self.manual = manual
 
-        self.board_length = 8
+        self.board_length = 14
         self.n_players = 2
         self.board_shape = (self.board_length, self.board_length)
-        self.piece_num = 9
-        self.possible_action_num = 1269
+        self.piece_num = 21
+        self.possible_action_num = 13729
         self.action_space = gym.spaces.Discrete(self.possible_action_num)
-        self.observation_space = gym.spaces.Box(0, 2, (self.board_length*self.board_length+1269,))
+        self.observation_space = gym.spaces.Box(0, 2, (self.board_length*self.board_length+self.possible_action_num,))
         self.verbose = verbose
 
-
+    #@jit(nopython=True)
     @property
     def observation(self):
         #combine current board state, legal_action
@@ -60,6 +75,7 @@ class BlokusEnv(gym.Env):
 
 
 
+    #@jit(nopython=True)
     @property
     def legal_actions(self):
         legal_action = np.zeros(self.possible_action_num)
@@ -71,11 +87,11 @@ class BlokusEnv(gym.Env):
                             r = point[0]+i
                             c = point[1]+j
                             if self.inboard(pos.h, pos.w, r, c) and self.chk_possible(point,r,c,pos) and self.chk_occupied(r,c,pos) and self.chk_adjacent(r,c,pos):
-                                action_num = action_marking[piece.id-1] + (pos.id-1)*piece.dim_size + (r-(pos.h-1))*(self.board_length-(pos.w-1)) + c-(pos.w-1) +1
+                                action_num = action_marking[piece.id-1] + (pos.id-1)*piece.dim_size + (r-(pos.h-1))*(self.board_length-(pos.w-1)) + c-(pos.w-1)
                                 legal_action[action_num] = 1
         return legal_action
 
-
+    #@jit(nopython=True)
     def inboard(self, h, w, r, c):
         if r-(h-1)>=0 and c-(w-1)>=0 and r<=self.board_length-1 and c<=self.board_length-1:
             return True
@@ -83,7 +99,7 @@ class BlokusEnv(gym.Env):
             return False
 
 
-
+    #@jit(nopython=True)
     def chk_possible(self, possible, r, c, pos):
         for grid in pos.loc:
             x,y = r-(pos.h-1)+grid[0], c-(pos.w-1)+grid[1]
@@ -93,7 +109,7 @@ class BlokusEnv(gym.Env):
         return False
 
 
-
+    #@jit(nopython=True)
     def chk_occupied(self, r, c, pos):
         for grid in pos.loc:
             x,y = r-(pos.h-1)+grid[0], c-(pos.w-1)+grid[1]
@@ -104,7 +120,7 @@ class BlokusEnv(gym.Env):
         return True
 
 
-
+    #@jit(nopython=True)
     def chk_adjacent(self, r, c, pos):
         for grid in pos.loc:
             x,y = r-(pos.h-1)+grid[0], c-(pos.w-1)+grid[1]
@@ -120,7 +136,7 @@ class BlokusEnv(gym.Env):
     def current_player(self):
         return self.players[self.current_player_num]
 
-
+    #@jit(nopython=True)
     def get_point(self, board):
         #original
         point_list = []
@@ -131,7 +147,7 @@ class BlokusEnv(gym.Env):
                     point_list.append(point)
         return point_list
 
-
+    #@jit(nopython=True)
     def calc_reward(self, board, id):
         #print(board)
         tot_point=0
@@ -163,6 +179,7 @@ class BlokusEnv(gym.Env):
         for player in self.players:
             player.turn_update(self.board)
 
+    #@jit(nopython=True)
     def step(self, action):
         reward = [0,0]
         self.update_board(self.translate_action(action))
@@ -189,14 +206,14 @@ class BlokusEnv(gym.Env):
 
         return self.observation, reward, done, {}
 
-
+    #@jit(nopython=True)
     def update_board(self, action):
         id, loc_h, loc_w, pos = action[0], action[1], action[2], action[3]
         h, w, loc = pos.h, pos.w, pos.loc
         for grid in loc:
             self.board[grid[0]+loc_h-(h-1)][grid[1]+loc_w-(w-1)] = self.current_player.id
 
-
+    #@jit(nopython=True)
     def choose_winner(self):
         '''
         ans = 0
@@ -227,6 +244,7 @@ class BlokusEnv(gym.Env):
             score = [0,0]
         return score
 
+    #@jit(nopython=True)
     def change_turn(self):
         '''
         done = True
@@ -250,11 +268,13 @@ class BlokusEnv(gym.Env):
 
         return done
 
+    #@jit(nopython=True)
     def translate_action(self, action):
         #translated_action int->id,loc_h,loc_w,pos
+        action+=1
         translated_action = []
         id = None
-        for id in range(10):
+        for id in range(self.piece_num+1):
             if action > action_marking[id] and action <= action_marking[id+1]:
                 action = action-action_marking[id]
                 translated_action.append(id+1)
