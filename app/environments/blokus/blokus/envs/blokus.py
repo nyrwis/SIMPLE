@@ -14,6 +14,7 @@ from .classes import Piece, Player
 
 #information of each piece
 #[id, num of spaces each piece cover, (num of possible grid location in a row, num of possible grid location in a column), possible position, (grid_h, grid_w, grid location)]
+'''
 p1 = [1, 1, 196, 1, [[1, 1, [(0, 0)]]]]
 p2 = [2, 2, 182, 2, [[1, 2, [(0, 0), (0, 1)]], [2, 1, [(0, 0), (1, 0)]]]]
 p3 = [3, 3, 169, 4, [[2, 2, [(0, 0), (0, 1), (1, 0)]], [2, 2, [(0, 0), (0, 1), (1, 1)]], [2, 2, [(0, 1), (1, 0), (1, 1)]], [2, 2, [(0, 0), (1, 0), (1, 1)]]]]
@@ -42,9 +43,26 @@ piece_list = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, 
 piece_point = [1, 2, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
 
 #accumulated possible action for each piece
-#action_marking = [0, 64, 176, 372, 468, 517, 685, 765, 1101, 1269, 10000]
-action_marking = [0, 196, 560, 1236, 1572, 1741, 2365, 2673, 3921, 4545, 5689, 6265, 6841, 7985, 8561, 8841, 10089, 10665, 11289, 12441, 12585, 13729, 20000]
 
+action_marking = [0, 196, 560, 1236, 1572, 1741, 2365, 2673, 3921, 4545, 5689, 6265, 6841, 7985, 8561, 8841, 10089, 10665, 11289, 12441, 12585, 13729, 20000]
+'''
+
+p1 = [1, 1, 64, 1, [[1, 1, [(0, 0)]]]]
+p2 = [2, 2, 56, 2, [[1, 2, [(0, 0), (0, 1)]], [2, 1, [(0, 0), (1, 0)]]]]
+p3 = [3, 3, 49, 4, [[2, 2, [(0, 0), (0, 1), (1, 0)]], [2, 2, [(0, 0), (0, 1), (1, 1)]], [2, 2, [(0, 1), (1, 0), (1, 1)]], [2, 2, [(0, 0), (1, 0), (1, 1)]]]]
+p4 = [4, 3, 48, 2, [[1, 3, [(0, 0), (0, 1), (0, 2)]], [3, 1, [(0, 0), (1, 0), (2, 0)]]]]
+p5 = [5, 4, 49, 1, [[2, 2, [(0, 0), (0, 1), (1, 0), (1, 1)]]]]
+p6 = [6, 4, 42, 4, [[2, 3, [(0, 1), (1, 0), (1, 1), (1, 2)]], [3, 2, [(0, 0), (1, 0), (1, 1), (2, 0)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 1)]], [3, 2, [(0, 1), (1, 0), (1, 1), (2, 1)]]]]
+p7 = [7, 4, 40, 2, [[1, 4, [(0, 0), (0, 1), (0, 2), (0, 3)]], [4, 1, [(0, 0), (1, 0), (2, 0), (3, 0)]]]]
+p8 = [8, 4, 42, 8, [[2, 3, [(0, 0), (1, 0), (1, 1), (1, 2)]], [3, 2, [(0, 0), (0, 1), (1, 0), (2, 0)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 2)]], [3, 2, [(0, 1), (1, 1), (2, 0), (2, 1)]], [2, 3, [(0, 2), (1, 0), (1, 1), (1, 2)]], [3, 2, [(0, 0), (1, 0), (2, 0), (2, 1)]], [2, 3, [(0, 0), (0, 1), (0, 2), (1, 0)]], [3, 2, [(0, 0), (0, 1), (1, 1), (2, 1)]]]]
+p9 = [9, 4, 42, 4, [[2, 3, [(0, 0), (0, 1), (1, 1), (1, 2)]], [3, 2, [(0, 1), (1, 0), (1, 1), (2, 0)]], [2, 3, [(0, 1), (0, 2), (1, 0), (1, 1)]], [3, 2, [(0, 0), (1, 0), (1, 1), (2, 1)]]]]
+
+
+piece_list = [p1, p2, p3, p4, p5, p6, p7, p8, p9]
+
+piece_point = [1, 2, 3, 3, 4, 4, 4, 4, 4]
+
+action_marking = [0, 64, 176, 372, 468, 517, 685, 765, 1101, 1269, 10000]
 
 class BlokusEnv(gym.Env):
     metadata = {'render.modes': ['human']}
@@ -54,11 +72,11 @@ class BlokusEnv(gym.Env):
         self.name = 'blokus'
         self.manual = manual
 
-        self.board_length = 14
+        self.board_length = 8 #14
         self.n_players = 2
         self.board_shape = (self.board_length, self.board_length)
-        self.piece_num = 21
-        self.possible_action_num = 13729
+        self.piece_num = 9 #21
+        self.possible_action_num = 1269 #13729
         self.action_space = gym.spaces.Discrete(self.possible_action_num)
         self.observation_space = gym.spaces.Box(0, 2, (self.board_length*self.board_length+self.possible_action_num,))
         self.verbose = verbose
@@ -67,13 +85,41 @@ class BlokusEnv(gym.Env):
     @property
     def observation(self):
         #combine current board state, legal_action
-        combined_observation = np.array(self.board).flatten()
+        combined_observation = np.array(self.obs_regularize(self.obs_rotate(self.board, (self.current_player.id)%4*self.n_players), self.current_player.id+1)).flatten()
         x = np.array(self.legal_actions)
         combined_observation = np.append(combined_observation, x)
 
         return combined_observation
 
+    def obs_rotate(self, board, ror):
+        
+        def obs_ror(input):
 
+            ret = np.zeros((self.board_length, self.board_length), int)
+
+            for i in range(self.board_length):
+                for j in range(self.board_length):
+                    ret[j][self.board_length-i-1] = input[i][j]
+
+            return ret
+
+        for n in range(ror%4):
+            board = obs_ror(board)
+
+        return board
+
+    def obs_regularize(self, board, id):
+
+        #board = np.zeros((self.board_length, self.board_length), int)
+        #board = (board - id + 1)
+        for i in range(self.board_length):
+            for j in range(self.board_length):
+                if (board[i][j])>0:
+                    board[i][j] = board[i][j]-id + 1
+                    if (board[i][j])<=0:
+                        board[i][j] = board[i][j]+self.n_players
+
+        return board
 
     #@jit(nopython=True)
     @property
@@ -161,7 +207,8 @@ class BlokusEnv(gym.Env):
 
 
     def reset(self):
-        self.board = [[0 for i in range(self.board_length)] for j in range(self.board_length)]
+        #self.board = [[0 for i in range(self.board_length)] for j in range(self.board_length)]
+        self.board = np.zeros((self.board_length, self.board_length), int)
         self.players = [Player(1), Player(2)]
         for player in self.players:
             player.setup(self.board_length, self.piece_num)
@@ -311,7 +358,7 @@ class BlokusEnv(gym.Env):
             logger.debug(f"It is Player {self.current_player.id}'s turn to move")
         
         
-        for line in self.board:
+        for line in self.obs_regularize(self.obs_rotate(self.board, (self.current_player.id-1)%4*self.n_players), self.current_player.id):
             logger.debug(line)
 
         '''
@@ -335,6 +382,8 @@ class BlokusEnv(gym.Env):
         for line in self.current_player.possible:
             logger.debug(line)
         '''
+
+        #logger.debug(self.observation[:64])
 
         if self.verbose:
             pass

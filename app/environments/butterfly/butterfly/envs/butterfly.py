@@ -379,6 +379,7 @@ class ButterflyEnv(gym.Env):
         for p in self.players:
             logger.debug(f'Player {p.id} points: {p.position.score}')
 
+        self.legal_actions
 
     def rules_move(self):
         raise Exception('Rules based agent is not yet implemented for Butterfly!')

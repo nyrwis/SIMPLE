@@ -1,5 +1,7 @@
 import numpy as np
 
+BOARD_SIZE = 8
+
 class Piece():
     def __init__(self, info):
         self.id = info[0]
@@ -39,7 +41,7 @@ class Player():
         if self.id==1:
             self.possible[0][0] = 1
         elif self.id==2:
-            self.possible[13][13] = 1
+            self.possible[BOARD_SIZE-1][BOARD_SIZE-1] = 1
         #self.possible[0][0] = self.possible[0][7] = self.possible[7][0] = self.possible[7][7] = 1
 
 
@@ -76,7 +78,7 @@ class Player():
             for d in dir:
                 x = grid[0]+d[0]
                 y =  grid[1]+d[1]
-                if x>=0 and x<14 and y>=0 and y<14:
+                if x>=0 and x<BOARD_SIZE and y>=0 and y<BOARD_SIZE:
                     self.corners[x, y] = 1
             
 
@@ -91,7 +93,7 @@ class Player():
             for d in dir:
                 x = grid[0]+d[0]
                 y =  grid[1]+d[1]
-                if x>=0 and x<14 and y>=0 and y<14:
+                if x>=0 and x<BOARD_SIZE and y>=0 and y<BOARD_SIZE:
                     self.adjacents[x, y] = 1
 
 
